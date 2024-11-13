@@ -57,6 +57,8 @@ app.MapPut("/{id}", (int number, OrderUpdateDTO dto) =>
         isUpdatedStatus = true;
         message += "Статус заявки номер" + buffer.Number + "Изменён\n";
     }
+    if (dto.Comments != null || dto.Comments != "")
+        buffer.Comments.Add(dto.Comments);
     return Results.Json(buffer);
 });
 app.MapGet("/{num}", (int number) => repo.Find(ord => ord.Number == number));
@@ -69,7 +71,7 @@ ord.Status == param ||
 ord.Master == param));
 app.Run();
 
-record class OrderUpdateDTO(string Status, string Description, string Master);
+record class OrderUpdateDTO(string Status, string Description, string Master, string Comments);
 record class OrderUpdateStatusDTO(List<Order> repo, string message);
 class Order
 {
@@ -108,4 +110,5 @@ class Order
     public string Client { get => client; set => client = value; }
     public string Status { get => status; set => status = value; }
     public string Master { get => master; set => master = value; }
+    public List<string> Comments { get; set; } = [];
 }
