@@ -27,7 +27,7 @@ app.MapPost("/", (Order ord) =>
     repo.Add(ord);
     return Results.Ok(ord); 
 });
-app.MapPut("/{number}", (int number, OrderUpdateDTO dto) =>
+app.MapPut("/{id}", (int number, OrderUpdateDTO dto) =>
 {
     Order buffer = repo.Find(ord => ord.Number == number);
     if (buffer == null)
@@ -37,6 +37,7 @@ app.MapPut("/{number}", (int number, OrderUpdateDTO dto) =>
     buffer.Master = dto.Master;
     return Results.Json(buffer);
 });
+app.MapGet("/{num}", (int number) => repo.Find(ord => ord.Number == number));
 app.Run();
 
 record class OrderUpdateDTO(string Status, string Description, string Master);
