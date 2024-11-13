@@ -18,7 +18,7 @@ app.UseCors("AllowAll");
 
 List<Order> repo = new List<Order>()
 {
-    new Order(1, 03, 03, 2005, "Тостер", "Сгорел", "Включил и сгорел", "Кирилл", "В процессе", "Светлоликий")
+    new Order(1, 03, 03, 2005, "Тостер", "Сгорел", "Включил и сгорел", "Кирилл", "В процессе")
 
 };
 
@@ -84,7 +84,7 @@ class Order
     string status;
     string master;
 
-    public Order(int number, int day, int month, int year, string device, string problem, string description, string client, string status, string master)
+    public Order(int number, int day, int month, int year, string device, string problem, string description, string client, string status)
     {
         Number = number;
         Day = day;
@@ -95,7 +95,7 @@ class Order
         Description = description;
         Client = client;
         Status = status;
-        Master = master;
+        Master = "Не назначен";
     }
 
     public int Number { get => number; set => number = value; }
