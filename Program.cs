@@ -23,7 +23,20 @@ List<Order> repo = new List<Order>()
 };
 
 
-app.MapGet("/", () => repo);
+bool isUpdatedStatus = false;
+string message = "";
+
+app.MapGet("/", () => {
+    if (isUpdatedStatus)
+    {
+        string buffer = message;
+        isUpdatedStatus = false; 
+        message = "";
+        return Results.Json(new OrderUpdateStatusDTO(repo, buffer));
+    }
+    else
+        return Results.Json(repo);
+    });
 app.MapPost("/", (Order ord) =>
 {
     repo.Add(ord);
@@ -32,9 +45,12 @@ app.MapPost("/", (Order ord) =>
 app.MapPut("/{id}", (int number, OrderUpdateDTO dto) =>
 {
     Order buffer = repo.Find(ord => ord.Number == number);
-    if (buffer == null)
-        return Results.NotFound("Нету");
-    buffer.Status = dto.Status;
+    if (buffer.Status != dto.Status)
+    {
+        buffer.Status = dto.Status;
+        isUpdatedStatus = true;
+        message += "Статус заявки номер" + buffer.Number + "Изменён\n";
+    }
     buffer.Description = dto.Description;
     buffer.Master = dto.Master;
     return Results.Json(buffer);
@@ -50,7 +66,7 @@ ord.Master == param));
 app.Run();
 
 record class OrderUpdateDTO(string Status, string Description, string Master);
-
+record class OrderUpdateStatusDTO(List<Order> repo, string message);
 class Order
 {
     int number;
