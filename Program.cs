@@ -22,9 +22,15 @@ List<Order> repo = new List<Order>()
 
 };
 
+foreach (var ord in repo)
+{
+    ord.EndDate = DateTime.Now;
+    ord.Status = "Завершено";
+}
 
-bool isUpdatedStatus = false;
+
 string message = "";
+bool isUpdatedStatus = false;
 
 app.MapGet("/", () => {
     if (isUpdatedStatus)
@@ -71,7 +77,7 @@ ord.Description == param ||
 ord.Client == param ||
 ord.Status == param ||
 ord.Master == param));
-app.MapGet("/stat/complcount", () => repo.FindAll(ord => ord.Status == "Завершено"));
+app.MapGet("/stat/complcount", () => repo.FindAll(ord => ord.Status == "Завершено").Count);
 app.MapGet("/stat/problemTypes", () =>{
     Dictionary<string, int> result = [];
     foreach (var ord in repo)
@@ -79,7 +85,17 @@ app.MapGet("/stat/problemTypes", () =>{
         else  result[ord.Problem] = 1;
     return result;
 });
-
+app.MapGet("/stat/avrg", () => {
+    double timeSum = 0;
+    int ordCount = 0;
+    foreach (var ord in repo)
+        if (ord.Status == "Завершено")
+        {
+            timeSum+= ord.TimeInDay();
+            ordCount++;
+        }
+    return ordCount > 0 ? timeSum/ordCount : 0;
+});
 app.Run();
 
 record class OrderUpdateDTO(string Status, string Description, string Master, string Comments);
@@ -117,4 +133,6 @@ class Order
     public string Status { get => status; set => status = value; }
     public string Master { get => master; set => master = value; }
     public List<string> Comments { get; set; } = [];
+    public double TimeInDay() => (EndDate - StartDate).Value.TotalDays;
+
 }
