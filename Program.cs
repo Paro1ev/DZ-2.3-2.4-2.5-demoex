@@ -69,6 +69,7 @@ ord.Description == param ||
 ord.Client == param ||
 ord.Status == param ||
 ord.Master == param));
+app.MapGet("/stat/complcount", () => repo.FindAll(ord => ord.Status == "Завершено");
 app.Run();
 
 record class OrderUpdateDTO(string Status, string Description, string Master, string Comments);
