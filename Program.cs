@@ -1,3 +1,5 @@
+using System.Diagnostics.Metrics;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -38,6 +40,13 @@ app.MapPut("/{id}", (int number, OrderUpdateDTO dto) =>
     return Results.Json(buffer);
 });
 app.MapGet("/{num}", (int number) => repo.Find(ord => ord.Number == number));
+app.MapGet("/filter/{param}", (string param) => repo.FindAll(ord =>
+ord.Device == param ||
+ord.Problem == param ||
+ord.Description == param ||
+ord.Client == param ||
+ord.Status == param ||
+ord.Master == param));
 app.Run();
 
 record class OrderUpdateDTO(string Status, string Description, string Master);
