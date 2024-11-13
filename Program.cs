@@ -56,6 +56,8 @@ app.MapPut("/{id}", (int number, OrderUpdateDTO dto) =>
         buffer.Status = dto.Status;
         isUpdatedStatus = true;
         message += "Статус заявки номер" + buffer.Number + "Изменён\n";
+        if(buffer.Status == "Завершено")
+            buffer.EndDate = DateTime.Now;
     }
     if (dto.Comments != null || dto.Comments != "")
         buffer.Comments.Add(dto.Comments);
@@ -69,7 +71,15 @@ ord.Description == param ||
 ord.Client == param ||
 ord.Status == param ||
 ord.Master == param));
-app.MapGet("/stat/complcount", () => repo.FindAll(ord => ord.Status == "Завершено");
+app.MapGet("/stat/complcount", () => repo.FindAll(ord => ord.Status == "Завершено"));
+app.MapGet("/stat/problemTypes", () =>{
+    Dictionary<string, int> result = [];
+    foreach (var ord in repo)
+        if (result.ContainsKey(ord.Problem)) result[ord.Problem]++;
+        else  result[ord.Problem] = 1;
+    return result;
+});
+
 app.Run();
 
 record class OrderUpdateDTO(string Status, string Description, string Master, string Comments);
@@ -77,9 +87,6 @@ record class OrderUpdateStatusDTO(List<Order> repo, string message);
 class Order
 {
     int number;
-    int day;
-    int month;
-    int year;
     string device;
     string problem;
     string description;
@@ -90,9 +97,8 @@ class Order
     public Order(int number, int day, int month, int year, string device, string problem, string description, string client, string status)
     {
         Number = number;
-        Day = day;
-        Month = month;
-        Year = year;
+        StartDate = new DateTime(year,month,day);
+        EndDate = null;
         Device = device;
         Problem = problem;
         Description = description;
@@ -102,9 +108,8 @@ class Order
     }
 
     public int Number { get => number; set => number = value; }
-    public int Day { get => day; set => day = value; }
-    public int Month { get => month; set => month = value; }
-    public int Year { get => year; set => year = value; }
+    public DateTime StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
     public string Device { get => device; set => device = value; }
     public string Problem { get => problem; set => problem = value; }
     public string Description { get => description; set => description = value; }
