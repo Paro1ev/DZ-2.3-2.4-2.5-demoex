@@ -45,14 +45,18 @@ app.MapPost("/", (Order ord) =>
 app.MapPut("/{id}", (int number, OrderUpdateDTO dto) =>
 {
     Order buffer = repo.Find(ord => ord.Number == number);
+    if (buffer == null)
+        return Results.StatusCode(404);
+    if (buffer.Description != dto.Description)
+        buffer.Description = dto.Description;
+    if (buffer.Master != dto.Master)
+        buffer.Master = dto.Master;
     if (buffer.Status != dto.Status)
     {
         buffer.Status = dto.Status;
         isUpdatedStatus = true;
         message += "Статус заявки номер" + buffer.Number + "Изменён\n";
     }
-    buffer.Description = dto.Description;
-    buffer.Master = dto.Master;
     return Results.Json(buffer);
 });
 app.MapGet("/{num}", (int number) => repo.Find(ord => ord.Number == number));
